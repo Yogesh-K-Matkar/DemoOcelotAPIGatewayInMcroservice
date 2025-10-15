@@ -1,0 +1,6 @@
+@UserIdentityAPI_HostAddress = http://localhost:5263
+
+GET {{UserIdentityAPI_HostAddress}}/user/
+Accept: application/json
+
+###

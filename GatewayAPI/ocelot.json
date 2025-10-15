@@ -1,0 +1,102 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/account/register/{email}/{password}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/AccountRegister/{email}/{password}",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/account/login/{email}/{password}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7003
+        }
+      ],
+      "UpstreamPathTemplate": "/api/AccountLogin/{email}/{password}",
+      "UpstreamHttpMethod": [ "POST" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/User/GetAllUsers",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7001
+        },
+        {
+          "Host": "localhost",
+          "Port": 7004
+        },
+        {
+          "Host": "localhost",
+          "Port": 7005
+        }
+      ],
+      "UpstreamPathTemplate": "/api/UsersListing",
+      "UpstreamHttpMethod": [ "GET" ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "User",
+        "Header": "Cache-Control",
+        "EnableContentHashing": false
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "60s",
+        "PeriodTimespan": 6,
+        "Limit": 2
+      },
+      "Key": "UserMicroService",
+      "LoadBalancerOptions": { "Type": "LeastConnection" }
+    },
+    {
+      "DownstreamPathTemplate": "/api/WeatherForecast/GetWeatherForecastDetails",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7002
+        }
+      ],
+      "UpstreamPathTemplate": "/api/WeatherListing",
+      "UpstreamHttpMethod": [ "GET" ],
+      "FileCacheOptions": {
+        "TtlSeconds": 60,
+        "Region": "WeatherForecast",
+        "Header": "Cache-Control",
+        "EnableContentHashing": false
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "60s",
+        "PeriodTimespan": 6,
+        "Limit": 2
+      },
+      "Key": "WeatherForecastMicroService"
+    }
+  ],
+  "Aggregates": [
+    {
+      "RouteKeys": [
+        "UserMicroService",
+        "WeatherForecastMicroService"
+      ],
+      "UpstreamPathTemplate": "/api/AllListingAggregateRequest",
+      "UpstreamHttpMethod": [ "GET" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7000"
+  }
+}
