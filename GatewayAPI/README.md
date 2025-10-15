@@ -164,23 +164,153 @@
 
  ![WebAPIFloderStructure](images/ASPNetCoreWebAPI_FolderStructure.png)
 
-  - **Program.cs**: Entry point of the application. It configures and starts the web host, sets up middleware, and defines routing for the API endpoints.
-  
-      - **var builder = WebApplication.CreateBuilder(args);**: Initializes a new instance of the WebApplicationBuilder class, which is used to configure the application.
-      - **builder.Services.AddControllers();**: Registers the controllers with the dependency injection container, allowing them to be resolved and used in the application.
-      - **var app = builder.Build();**: Builds the application and prepares it to handle incoming requests.
-      - **app.UseHttpsRedirection();**: Middleware that redirects HTTP requests to HTTPS for secure communication.
-      - **app.UseAuthorization();**: Middleware that enables authorization for protected resources in the API.
-      - **app.MapControllers();**: Maps controller routes to their corresponding endpoints, allowing them to handle incoming requests.
-      - **app.Run();**: Starts the application and begins listening for incoming requests.
-  
-  - **Controllers Folder**: Contains controller classes that handle incoming HTTP requests and return responses. Each controller typically corresponds to a specific resource or functionality in the API.  
-      - **WeatherForecastController.cs**: A sample controller that demonstrates how to create endpoints for handling HTTP requests. It includes methods for GET requests to retrieve weather forecast data.
-  
-  - **appsettings.json**: Configuration file that contains settings for the application, such as connection strings, logging settings, and other configuration options.
-  - **Properties Folder**: Contains project properties and settings, including launch settings for debugging and running the application.
-  - **Dependencies Folder**: Lists all NuGet packages and project references that the application depends on.
-  
+1. Creating the **WebApplication builder**
+
+    Syntax:
+    ```csharp
+            var builder = WebApplication.CreateBuilder(args);
+    ```
+This line initializes an instance of WebApplicationBuilder.
+
+**CreateBuilder(args) sets up**:
+
+- Kestrel web server
+- Configuration (from appsettings.json, environment vars, etc.)
+- Logging and Hosting Environment
+
+It prepares the foundation for service registration (Dependency Injection setup).
+
+2. **Registering Services**
+    
+    Syntax:
+    ```csharp
+            builder.Services.AddControllers();
+    ```
+Adds controller-related services required to build Web API endpoints.
+
+The Dependency Injection (DI) container stores these services.
+
+You can also add services like AddDbContext, AddCors, or custom services here.
+
+   Syntax:
+
+    ```csharp
+            builder.Services.AddScoped<IProductService, ProductService>();
+     ```
+This allows controllers to receive ProductService through constructor injection.
+
+3. **Building the Application**
+    
+    Syntax:
+
+    ```csharp
+            var app = builder.Build();
+    ```
+
+Build() finalizes the builder configuration and returns a WebApplication instance.
+
+This instance represents the actual running web app.
+
+Now the app is ready to set up its middleware pipeline.
+
+4.**Configuring the Middleware Pipeline**
+This sequence handles every incoming HTTP request.
+
+(a) **Exception Handling & HSTS**
+
+   Syntax:
+
+    ```csharp
+                if (!app.Environment.IsDevelopment())
+                {
+                    app.UseExceptionHandler("/Error");
+                    app.UseHsts();
+                }
+    ```
+In production, the UseExceptionHandler middleware catches unhandled exceptions.
+
+UseHsts() adds HTTP Strict Transport Security headers for better security.
+
+(b) **HTTPS Redirection and Static Files**
+    Syntax:
+
+    ```csharp
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+    ```
+
+Redirects HTTP to HTTPS.
+
+Serves static files (like JS, CSS, images) from the wwwroot folder.
+
+(c) **Routing and Authorization**
+    Syntax:
+
+    ```csharp
+            app.UseRouting();
+            app.UseAuthorization();
+    ```
+
+UseRouting() enables the routing system to match requests to endpoints.
+
+UseAuthorization() enforces access rules defined in controllers or middleware.
+
+5. **Mapping Endpoints**
+    Syntax:
+
+     ```csharp
+            app.MapControllers();
+     ```
+
+Connects the controller endpoints to the request pipeline.
+
+It ensures that routes like /api/products or /api/users get handled by corresponding controller actions.
+
+You might also see:
+
+Syntax:
+```csharp
+        app.MapGet("/hi", () => "Hello!");
+```
+which defines a Minimal API endpoint for quick responses.
+
+6. **Running the Application**
+    Syntax:
+
+    ```csharp
+        app.Run();
+    ```
+
+Starts the web server (Kestrel) and begins listening for HTTP requests.
+
+This is a blocking call — it runs until the application stops.
+
+Request Execution Flow (when an API request is made)
+Let's see what happens when a client hits /api/products:
+
+Kestrel receives the incoming HTTP request.
+
+The request passes through each middleware in the order they’re registered.
+
+HTTPS redirection → Exception handling → Routing → Authorization → Controller matching.
+
+The Routing Middleware matches /api/products with a controller action.
+
+The corresponding controller method executes.
+
+The response (JSON or otherwise) travels back through the middleware pipeline to the client.
+
+**Quick Summary Mnemonic: B.S.B.M.R.R.M 🧩**
+
+**Step	Code Part**   :-	         **Purpose**      
+-	Builder Creation :-       	     WebApplication.CreateBuilder(args)    
+-	Service Registration:-	         builder.Services.AddControllers()
+-	Build App:-	                         builder.Build()
+-	Middleware Setup:-	         app.Use...() pipeline
+-	Routing:-	                             app.MapControllers()
+-	Run App:-	                         app.Run()
+-	Middleware Execution (runtime request)	Request passes through to controllers
+
  ## Running Project
   - Step 1:- Open Visual Studio 2022 and load your .NET Core Web API project.
   - Step 2:- Set the desired launch profile (e.g., IIS Express or Project) from the dropdown menu next to the "Run" button in the toolbar.
