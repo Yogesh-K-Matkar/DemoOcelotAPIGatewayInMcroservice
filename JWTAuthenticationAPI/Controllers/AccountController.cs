@@ -67,6 +67,7 @@ namespace JWTAuthenticationAPI.Controllers
 
             if (!string.IsNullOrEmpty(getEmail))
             {
+                //UserData.Clear();
                 return BadRequest(new { UserName = email, Password = password, Message = "User already exists." } );
             }
 

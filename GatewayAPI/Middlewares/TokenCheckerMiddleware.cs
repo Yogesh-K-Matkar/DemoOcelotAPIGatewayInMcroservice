@@ -11,6 +11,9 @@ namespace GatewayAPI.Middlewares
 
             if (requestPath.Contains("AccountRegister", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Contains("AccountLogin", StringComparison.CurrentCultureIgnoreCase) ||
+                requestPath.Contains("UsersListing", StringComparison.CurrentCultureIgnoreCase) ||
+                requestPath.Contains("WeatherListing", StringComparison.CurrentCultureIgnoreCase) ||
+                requestPath.Contains("AllListingAggregateRequest", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Equals("/"))
             {
                 await next(context);

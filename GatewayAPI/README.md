@@ -40,69 +40,7 @@
   - **Community and Support**:- Has a large and active community, along with extensive documentation and support from Microsoft.
   - **Regular Updates**:- Microsoft actively maintains and updates .NET Core, ensuring it stays current with the latest technologies and security standards.  
   
-
-  ## Installation Steps
-  
-  - Step 1:- Download the .NET SDK from the official Microsoft website: https://dotnet.microsoft.com/download
-
-  - Step 2:- Choose the appropriate version for your operating system (Windows, macOS, or Linux) and follow the installation instructions provided on the website.
-
-  - Step 3:- Verify the installation by opening a terminal or command prompt and running the following command:
-  
-      Syntax:
-       
-      ```bash
-    
-        dotnet --version
-
-      ```  
-
-  ## Create a New .NET Core Project
-  - Step 1:- Open a terminal or command prompt.
-  - Step 2:- Navigate to the directory where you want to create your new project.
-  - Step 3:- Run the following command to create a new console application:  
-      Syntax:   
-      ```bash
-    
-        dotnet new console -n MyFirstDotNetApp
-
-      ```
-  - Step 4:- Navigate into the project directory:
-      Syntax:      
-      ```bash
-    
-        cd MyFirstDotNetApp
-
-      ```
-  - Step 5:- Run the application using the following command:  
-      Syntax:
-      
-      ```bash
-    
-        dotnet run
-  
-      ```   
-  - Step 6:- You should see the output "Hello, World!" in the terminal, indicating that your .NET Core application is running successfully.  
-  - Step 7:- You can now start developing your .NET Core application by modifying the `Program.cs` file in the project directory.  
-  - Step 8:- To add additional packages or libraries to your project, you can use the `dotnet add package` command followed by the package name.  
-  - Step 9:- To build your project, use the following command:  
-      Syntax:
-      
-      ```bash
-    
-        dotnet build
-  
-      ```
-  - Step 10:- To publish your application for deployment, use the following command:  
-      Syntax:
-      
-      ```bash
-    
-        dotnet publish -c Release -o ./publish
-  
-      ```
-  - Step 11:- This will create a publish directory with the compiled application files that you can deploy to your desired environment.
-  
+***
 ***
 
 # Web API (Apllication Programing Interface Over Web)
@@ -117,6 +55,8 @@
      - Message passing requests and getting responses in proper message format (Text, XML, JSON(Latest widely used)).  
 
      Then Web API is called RESTful Web API.
+
+  ***
   
   ## Why Use Web API?
   
@@ -127,7 +67,10 @@
   - **Security**: APIs can provide controlled access to resources and data, allowing developers to implement authentication and authorization mechanisms. This helps protect sensitive information and ensures that only authorized users can access certain functionalities.  
   - **Innovation**: By exposing certain functionalities through APIs, organizations can encourage third-party developers to create new applications or services that enhance their offerings. This fosters innovation and      
 
+  ***
+
   ## Rules of RESTful Web API
+
   - **Stateless**: Client provides all information for each request, server dosen't store any client information.
   - **Client-Server Architecture**: Client and server are separate entities that communicate over a network. 
   - **Uniform Interface**: Clinet should need to follow standardized way of interacting with resources using HTTP methods/HTTP verbs (GET, POST, PUT, DELETE).  
@@ -135,7 +78,9 @@
   - **Layered System**: Web API can be composed of multiple layers, each with specific responsibilities (e.g., authentication, logging, etc.)
   - **Code on Demand (Optional)**: Server can send response with only data as per client request, not extra or unwanted data.
   
-  ***
+***
+***
+
 # .Net Core Web API 
 
  ## Steps To Create Project  
@@ -159,163 +104,154 @@
     
     Then click "Create".  
       
-  
+ ***
+
  ## Files and Folders Structure And Its Role
 
- ![WebAPIFloderStructure](images/ASPNetCoreWebAPI_FolderStructure.png)
+   ![WebAPIFloderStructure](images/ASPNetCoreWebAPI_FolderStructure.png)
 
-1. Creating the **WebApplication builder**
+ ***
+ ## Explain Program.cs file code - Configure Service and Middleware
 
-    Syntax:
-    ```csharp
-            var builder = WebApplication.CreateBuilder(args);
-    ```
-This line initializes an instance of WebApplicationBuilder.
+   **Configuration and building** of **WebApplication** by **adding servicess** and **handling incoming Request** using **Middleware**
+   in **Program.cs Application Entry Point of Execution**:- 
 
-**CreateBuilder(args) sets up**:
+   **Framework**:-
+    Microsoft.AspNetCore.App
+    Microsoft.NetCore.App
 
-- Kestrel web server
-- Configuration (from appsettings.json, environment vars, etc.)
-- Logging and Hosting Environment
+   **Packages**:-
+    Swashbuckle.AspNetCore         --For Swagger
 
-It prepares the foundation for service registration (Dependency Injection setup).
+   Ocelot                                         --For API Gateway Request Management
+   Ocelot.Cache.CacheManager     
 
-2. **Registering Services**
+
+   1. **Core Web API Program.cs Flow**
+   
+        a. **Create WebApplication Builder**
+         
+              Syntax:
+                ```csharp
+                        var builder = WebApplication.CreateBuilder(args);
+                ```
+              Initializes app builder with default settings, Kestrel server, logging, configuration including appsettings.json.
+
+              Provides builder.Services for Dependency Injection (DI) registrations.
+
+        b. **Register Services (Dependency Injection)**
+       
+              Use builder.Services to register services your app depends on:
+
+              Controllers: builder.Services.AddControllers();
+
+              Database contexts, repositories, custom services
+
+              Authentication, swagger, caching, HTTP clients, etc.
+
+              Examples of DI service lifetimes:
+                **AddScoped**: one instance per HTTP request
+                **AddSingleton**: one instance for app lifetime
+                **AddTransient**: a new instance every injection
+
+        c. **Build the App**
+        
+              Syntax:
+                 ```csharp
+                         var app = builder.Build();
+                 ```
+         
+              Compiles all configurations and services into an application instance.
+
+        d. **Setup Middleware Pipeline**
+        
+              Register middleware components that intercept requests:
+
+              Routing: app.UseRouting();
+              Authorization: app.UseAuthorization();
+              Controller endpoints: app.MapControllers();
+              Logging, exception handling middleware may also be added.
+
+        e. **Run the App**
+                
+              Syntax:
+                  ```csharp
+                         app.Run();
+                   ```  
+          
+              Starts the Kestrel web server and begins listening for HTTP requests.
+
+    ***
     
-    Syntax:
-    ```csharp
-            builder.Services.AddControllers();
-    ```
-Adds controller-related services required to build Web API endpoints.
+   2. **Ocelot API Gateway Program.cs Flow**
+   
+        a. **Create Builder and Load Ocelot Config**
+         
+              Syntax: 
+                  ```csharp
+                        var builder = WebApplication.CreateBuilder(args);
+                        builder.Configuration.AddJsonFile("ocelot.json");
+                  ```
+          
+              Adds Ocelot-specific config file that defines routing, aggregation, authentication, rate limiting.
 
-The Dependency Injection (DI) container stores these services.
+        b. **Register Ocelot Services**
+                
+              Syntax:
+                  ```csharp
+                         builder.Services.AddOcelot();
+                  ```
+          
+              Registers Ocelot middleware and infrastructure for API Gateway features like routing, load balancing.
 
-You can also add services like AddDbContext, AddCors, or custom services here.
+        c. **Build the App**
+         
+              Syntax:
+                  ```csharp
+                         var app = builder.Build();
+                  ```
+         
+              Creates the configured app with Ocelot services.
 
-   Syntax:
+        d. **Use Ocelot Middleware**
+              
+              Syntax:
+                  ```csharp
+                          app.UseOcelot().Wait();
+                  ```
+         
+              Adds Ocelot request handling pipeline to intercept incoming requests and forward to configured downstream services.
 
-    ```csharp
-            builder.Services.AddScoped<IProductService, ProductService>();
-     ```
-This allows controllers to receive ProductService through constructor injection.
+              This replaces or extends standard routing.
 
-3. **Building the Application**
-    
-    Syntax:
+        e. **Run the App**
+              
+              Syntax:  
+                  ```csharp
+                         app.Run();
+                  ```
+          
+              Starts the gateway server.
 
-    ```csharp
-            var app = builder.Build();
-    ```
+        3. **Dependency Injection (DI) in Both Contexts  **
+        
+              Both apps use the built-in ASP.NET Core DI container.
 
-Build() finalizes the builder configuration and returns a WebApplication instance.
+              Register services in builder.Services.
 
-This instance represents the actual running web app.
+              Controllers or services request dependencies via constructor injection.
 
-Now the app is ready to set up its middleware pipeline.
+              DI improves modularity, testability, and separates concerns.
 
-4.**Configuring the Middleware Pipeline**
-This sequence handles every incoming HTTP request.
+              **Example DI Registration**:
 
-(a) **Exception Handling & HSTS**
+              Syntax:
+                    ```csharp
+                           builder.Services.AddScoped<IProductService, ProductService>();
+                    ```
+              Registered dependencies can then be injected into controllers or other services automatically.
 
-   Syntax:
-
-    ```csharp
-                if (!app.Environment.IsDevelopment())
-                {
-                    app.UseExceptionHandler("/Error");
-                    app.UseHsts();
-                }
-    ```
-In production, the UseExceptionHandler middleware catches unhandled exceptions.
-
-UseHsts() adds HTTP Strict Transport Security headers for better security.
-
-(b) **HTTPS Redirection and Static Files**
-    Syntax:
-
-    ```csharp
-            app.UseHttpsRedirection();
-            app.UseStaticFiles();
-    ```
-
-Redirects HTTP to HTTPS.
-
-Serves static files (like JS, CSS, images) from the wwwroot folder.
-
-(c) **Routing and Authorization**
-    Syntax:
-
-    ```csharp
-            app.UseRouting();
-            app.UseAuthorization();
-    ```
-
-UseRouting() enables the routing system to match requests to endpoints.
-
-UseAuthorization() enforces access rules defined in controllers or middleware.
-
-5. **Mapping Endpoints**
-    Syntax:
-
-     ```csharp
-            app.MapControllers();
-     ```
-
-Connects the controller endpoints to the request pipeline.
-
-It ensures that routes like /api/products or /api/users get handled by corresponding controller actions.
-
-You might also see:
-
-Syntax:
-```csharp
-        app.MapGet("/hi", () => "Hello!");
-```
-which defines a Minimal API endpoint for quick responses.
-
-6. **Running the Application**
-    Syntax:
-
-    ```csharp
-        app.Run();
-    ```
-
-Starts the web server (Kestrel) and begins listening for HTTP requests.
-
-This is a blocking call — it runs until the application stops.
-
-Request Execution Flow (when an API request is made)
-Let's see what happens when a client hits /api/products:
-
-Kestrel receives the incoming HTTP request.
-
-The request passes through each middleware in the order they’re registered.
-
-HTTPS redirection → Exception handling → Routing → Authorization → Controller matching.
-
-The Routing Middleware matches /api/products with a controller action.
-
-The corresponding controller method executes.
-
-The response (JSON or otherwise) travels back through the middleware pipeline to the client.
-
-**Quick Summary Mnemonic: B.S.B.M.R.R.M 🧩**
-
-**Step	Code Part**   :-	         **Purpose**      
--	Builder Creation :-       	     WebApplication.CreateBuilder(args)    
--	Service Registration:-	         builder.Services.AddControllers()
--	Build App:-	                         builder.Build()
--	Middleware Setup:-	         app.Use...() pipeline
--	Routing:-	                             app.MapControllers()
--	Run App:-	                         app.Run()
--	Middleware Execution (runtime request)	Request passes through to controllers
-
- ## Running Project
-  - Step 1:- Open Visual Studio 2022 and load your .NET Core Web API project.
-  - Step 2:- Set the desired launch profile (e.g., IIS Express or Project) from the dropdown menu next to the "Run" button in the toolbar.
-  - Step 3:- Click on the "Run" button (or press F5) to start debugging the application. This will build the project and launch it in your default web browser.
-  - Step 4:- If you have enabled OpenAPI support (Swagger), you will see a Swagger UI page that lists all available API endpoints. You can use this interface to test your API by 
+ ***
 
  ## Main Concepts Of Projects
   
@@ -333,11 +269,15 @@ The response (JSON or otherwise) travels back through the middleware pipeline to
      - **Service Lifetimes** :- Services can be registered with different lifetimes, such as Singleton (one instance for the entire application), Scoped (one instance per request), or Transient (a new instance each time it is requested). This allows you to control the lifecycle of your services based on your application's needs.
 
 ***
+***
 
 # Monolathic vs Microservices Architecture
+
   ## Monolithic Architecture
+
   ![MonolithicArchitecture](images/Monolithic_Architecture.png)
-  - In Monolithic Architecture, the entire application is built as a single, cohesive unit. All components and functionalities are tightly integrated and run within a single process. This means that any changes or updates to one part of the application may require redeploying the entire application.
+  
+  In Monolithic Architecture, the entire application is built as a single, cohesive unit. All components and functionalities are tightly integrated and run within a single process. This means that any changes or updates to one part of the application may require redeploying the entire application.
   
   - **Advantages**:
      - Simplicity: Easier to develop, test, and deploy as a single unit.
@@ -348,27 +288,150 @@ The response (JSON or otherwise) travels back through the middleware pipeline to
      - Scalability: Difficult to scale individual components independently.
      - Maintenance: As the application grows, it can become complex and harder to maintain.
      - Deployment: Any change requires redeploying the entire application, leading to potential downtime.
-     
+ 
+   ***
+
   ## Microservices Architecture
+
   ![MicroservicesArchitecture](images/MicroServices_Architecture.png)
-  - In Microservices Architecture, the application is divided into smaller, independent services that communicate with each other through APIs. Each service is responsible for a specific functionality and can be developed, deployed, and scaled independently. This allows for greater flexibility and agility in development and deployment.
+
+  In Microservices Architecture, the application is divided into smaller, independent services that communicate with each other through APIs. Each service is responsible for a specific functionality and can be developed, deployed, and scaled independently. This allows for greater flexibility and agility in development and deployment.
+  
   - **Advantages**:
      - Scalability: Individual services can be scaled independently based on demand.
      - Flexibility: Different services can use different technologies and programming languages.
      - Resilience: Failure in one service does not necessarily impact the entire application.
      - Faster Development: Teams can work on different services simultaneously, speeding up development.
+  
   - **Disadvantages**:
      - Complexity: Managing multiple services can be complex and requires robust orchestration.
      - Communication Overhead: Services need to communicate over the network, which can introduce latency.
      - Data Consistency: Ensuring data consistency across services can be challenging.
      
-     
+  ***
+  
   ## When to Use Which?
-  - **Monolithic Architecture** is suitable for:
+
+  - **Monolithic Architecture** is suitable for:  
      - Small to medium-sized applications with limited complexity.
      - Applications with a stable feature set that do not require frequent updates.
      - Teams with limited resources or experience in managing distributed systems.
-  - **Microservices Architecture** is suitable for:
+     
+  - **Microservices Architecture** is suitable for: 
      - Large-scale applications with complex functionalities that require frequent updates.
      - Applications that need to scale specific components based on demand.
      - Teams with experience
+
+***
+***
+
+# API Gateway
+
+  ## What?
+  It acts as a single centralized entry point that manages and routes client requests to multiple backend services or APIs.
+
+  ## Why?
+  - Clients interact with a single endpoint
+  - Centralized authentication and authorization, protecting backend services.
+  - Features such as rate limiting and load balancing protect services from overload.
+  - Caching, and protocol translation
+  - Centralized logging and analytics
+
+  ## Explain Ocelot.json structure
+
+  **Ocelot** is a lightweight API Gateway framework for .NET Core, widely used to route and manage requests to microservices. Its configuration is primarily driven by a JSON file, often named ocelot.json.
+
+   Main Sections of ocelot.json
+   
+  1. **Routes (or ReRoutes in older versions)**
+ 
+     An array of route definitions.
+
+     Each route defines how an upstream request (from clients) is forwarded to a downstream service (your microservice).
+
+       Key properties inside each route:
+
+        - UpstreamPathTemplate: The route path clients call (e.g., /api/users/{id}).
+
+        - UpstreamHttpMethod: Allowed HTTP methods (GET, POST, etc.) for this route.
+
+        - DownstreamPathTemplate: The path on the backend service to forward to.
+
+        - DownstreamScheme: The protocol to use when forwarding (usually http or https).
+
+        - DownstreamHostAndPorts: Array specifying one or multiple backend hosts and ports.
+
+     **AuthenticationOptions** (optional): Defines security such as JWT bearer tokens.
+
+     **RateLimitOptions** (optional): Parameters to control request throttling.
+
+     **FileCacheOptions** (optional): Cache settings for responses.
+
+     **LoadBalancerOptions** (optional): Load balancing strategy among multiple backend hosts.
+
+   2. **Aggregates**
+    
+      Defines routes that combine multiple Routes' responses into one aggregated response.
+
+      Useful for reducing multiple downstream calls into a single upstream response.
+
+   3. **GlobalConfiguration**
+         Settings applied globally to all routes.
+
+      Syntax:
+
+        BaseUrl: The external address of the gateway.
+
+        Other settings for administration, request identification, etc.
+
+      **How It Works in Practice**
+    
+        When a client requests an endpoint matching an UpstreamPathTemplate, Ocelot:
+
+        Matches the request method to UpstreamHttpMethod.
+
+        Routes the request to the appropriate DownstreamHostAndPorts and DownstreamPathTemplate.
+
+        Applies middleware features like authentication, caching, rate limiting, or load balancing based on the route configuration.
+
+        Syntax:
+
+                ```json
+                        {
+                          "Routes": [
+                            {
+                              "UpstreamPathTemplate": "/api/users/{id}",
+                              "UpstreamHttpMethod": ["GET"],
+                              "DownstreamPathTemplate": "/api/users/{id}",
+                              "DownstreamScheme": "http",
+                              "DownstreamHostAndPorts": [
+                                { "Host": "localhost", "Port": 7001 }
+                              ],
+                              "AuthenticationOptions": {
+                                "AuthenticationProviderKey": "Bearer",
+                                "AllowedScopes": []
+                              },
+                              "RateLimitOptions": {
+                                "EnableRateLimiting": true,
+                                "Period": "1m",
+                                "Limit": 100
+                              }
+                            }
+                          ],
+                          "GlobalConfiguration": {
+                            "BaseUrl": "http://localhost:7000"
+                          }
+                        }
+                ```
+
+        **Summary**
+
+        Routes map external API paths to internal microservices.
+
+        Each route can have customized HTTP methods, security, caching, and load balancing.
+
+        GlobalConfiguration defines overall gateway behavior.
+
+        Aggregates combine multiple service responses into one.
+   
+    
