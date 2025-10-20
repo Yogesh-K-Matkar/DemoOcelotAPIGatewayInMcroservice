@@ -434,4 +434,56 @@
 
         Aggregates combine multiple service responses into one.
    
+   
+ ***  
+ ***
+ 
+ # Authentication Techniques in Web API
+
+  ## JWT(JSON Web Token) Authentication
+  - **JWT** is a compact, URL-safe means of representing claims to be transferred between two parties. It is commonly used for authentication and authorization in web applications.
+  - In JWT authentication, when a user logs in, the server generates a JWT containing user information and signs it with a secret key. The client then includes this token in the Authorization header of subsequent requests. The server verifies the token's signature and extracts user information to authenticate and authorize access to protected resources.
+  
+   **Advantages**:     
+   - Security: Signed tokens ensure data integrity and authenticity.
+   - Flexibility: Can include custom claims for additional user information.
+   - Standardized: Widely adopted and supported by many libraries and frameworks.
+   - Ease of Use: Simple to implement and use in various applications.
+
+  Example of JWT Structure:
+  
+   A JWT consists of three parts separated by dots (.), which are:
+   - Header: Contains metadata about the token, such as the signing algorithm.
+   - Payload: Contains the claims or user information.
+   - Signature: Used to verify the token's integrity and authenticity.
+   
+   Example JWT:
+        ```
+            eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        ```   
+  Implementation Code Snippet:
+  
+   Syntax:
+
+        ```csharp
+            // Generating JWT Token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes("your_secret key");
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.Name, user.Id.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddHours(1),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+        ```
+
+   
+     
+
     
+     
