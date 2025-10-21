@@ -11,6 +11,7 @@ namespace GatewayAPI.Middlewares
 
             if (requestPath.Contains("AccountRegister", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Contains("AccountLogin", StringComparison.CurrentCultureIgnoreCase) ||
+                 requestPath.Contains("AccountUsers", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Contains("UsersListing", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Contains("WeatherListing", StringComparison.CurrentCultureIgnoreCase) ||
                 requestPath.Contains("AllListingAggregateRequest", StringComparison.CurrentCultureIgnoreCase) ||

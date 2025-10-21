@@ -1,3 +1,6 @@
+using JWTAuthenticationAPI.Models;
+using JWTAuthenticationAPI.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Concurrent;
@@ -9,11 +12,22 @@ namespace JWTAuthenticationAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class AccountController(IConfiguration _config) : ControllerBase
+    public class AccountController : ControllerBase
     {
 
+        #region Dependency Inject using Interface
+        private readonly JWTAuthentication _JWTAuth;
+        
+        public AccountController(JWTAuthentication JWTAuth)
+        {
+            _JWTAuth = JWTAuth;
+        }
+        #endregion
+
+
         private static ConcurrentDictionary<string, string> UserData { get; set; } = new ConcurrentDictionary<string, string>();
-          
+
+        [AllowAnonymous]
         [HttpPost("login/{email}/{password}")]
         public async Task<IActionResult> Login(string email, string password)
         {
@@ -26,8 +40,8 @@ namespace JWTAuthenticationAPI.Controllers
 
                 if (Equals(dbPassword, password))
                 {
-                    string jwttoken = GenerateJSONWebToken(getEmail);
-                    return Ok(new { UserName = email, Password = password, Token= jwttoken, Message = "User login successfully." });
+                    TokenInfo jwttoken = _JWTAuth.GenerateJSONWebToken(getEmail);
+                    return Ok(new { UserName = email, Password = password, AccessToken= jwttoken.AccessToken, AccessTokenExpiry=jwttoken.AccessTokenExpiry, Message = "User login successfully." });
                 }
                 else
                 {
@@ -38,27 +52,37 @@ namespace JWTAuthenticationAPI.Controllers
             return NotFound(new { Message = "Email not found" });
         }
 
-        private string GenerateJSONWebToken(string getEmail)
-        {
-            var jwtkey = Encoding.UTF8.GetBytes(_config["Authentication:Key"]!);
-            var securitykey = new SymmetricSecurityKey(jwtkey);
-            var credentials = new SigningCredentials(securitykey, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.Email, getEmail!),
-            };
+        //private TokenDetails GenerateJSONWebToken(string getEmail)
+        //{
+        //    var tokenkey = Encoding.UTF8.GetBytes(_config["JwtConfig:Key"]!);
+        //    var tokenissuer = _config["JwtConfig:Issuer"]!;
+        //    var tokenaudience = _config["JwtConfig:Audience"]!;
+        //    var tokenvaliditymins = _config.GetValue<int>("JwtConfig:TokenValidityMins");
+        //    var tokenexpirytimestamp= DateTime.UtcNow.AddMinutes(tokenvaliditymins);
 
-            var jwttoken = new JwtSecurityToken(
-                issuer: _config["Authentication:Issuer"],
-                audience: _config["Authentication:Audience"],
-                claims: claims,
-                expires: null,
-                signingCredentials: credentials
-            );
+        //    var tokensecuritykey = new SymmetricSecurityKey(tokenkey);
+        //    var tokencredentials = new SigningCredentials(tokensecuritykey, SecurityAlgorithms.HmacSha256);
 
-            return new JwtSecurityTokenHandler().WriteToken(jwttoken);
-        }
+        //    var tokendescriptor = new SecurityTokenDescriptor
+        //    {
+        //        Subject = new ClaimsIdentity(new[]
+        //        {
+        //            new Claim(JwtRegisteredClaimNames.Email, getEmail),
+        //        }),
+        //        Expires = tokenexpirytimestamp,
+        //        Issuer = tokenissuer,
+        //        Audience =tokenaudience,
+        //        SigningCredentials = tokencredentials
+        //    };            
 
+        //    var jwttokenhandler = new JwtSecurityTokenHandler();
+        //    var jwtsecuritytoken = jwttokenhandler.CreateToken(tokendescriptor);
+        //    var jwtaccesstoken = jwttokenhandler.WriteToken(jwtsecuritytoken);
+
+        //    return  new TokenDetails { AccessToken = jwtaccesstoken, AccessTokenExpiry = tokenexpirytimestamp } ;
+        //}
+
+        [AllowAnonymous]
         [HttpPost("register/{email}/{password}")]
         public async Task<IActionResult> Register(string email, string password)
         {
@@ -74,6 +98,22 @@ namespace JWTAuthenticationAPI.Controllers
             UserData[email] = password;
 
             return Ok(new { UserName = email, Password = password, Message = "User registered successfully." } );
+        }
+
+
+        [Authorize]
+        [HttpGet("users")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            await Task.Delay(0);        //0.5 sec delay            
+
+            if (UserData != null && UserData.Count > 0)
+            {
+                var firstUser = UserData.First();
+                return Ok(new { UserName = firstUser.Key, UserPassword = firstUser.Value });
+            }
+            return NotFound(new { Message = "Users not found" });
+
         }
 
     }
