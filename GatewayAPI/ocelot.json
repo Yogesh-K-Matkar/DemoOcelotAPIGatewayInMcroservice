@@ -64,9 +64,9 @@
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "Period": "60s",
-        "PeriodTimespan": 6,
-        "Limit": 2
+        "Limit": 2,                                 //Number of requests allowed
+        "Period": "1m",                        //Time window for limit in 1m 2requests
+        "PeriodTimespan": 6               //Wait period after limit is reached after 2 limits wait for another limit to be reset in 6 seconds
       },
       "Key": "UserMicroService",
       "LoadBalancerOptions": { "Type": "LeastConnection" }

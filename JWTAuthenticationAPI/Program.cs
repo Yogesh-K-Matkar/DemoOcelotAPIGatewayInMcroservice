@@ -14,6 +14,8 @@ builder.Services.AddScoped<JWTAuthenticationAPI.Services.JWTAuthentication>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //builder.Services.AddEndpointsApiExplorer();
+
+//To show Atuthorized button to add JWT token in Swagger UI
 builder.Services.AddSwaggerGen(options => {
     var jwtSecurityScheme = new OpenApiSecurityScheme
     {
@@ -59,8 +61,9 @@ builder.Services.AddAuthentication(options=>
             IssuerSigningKey = new SymmetricSecurityKey(key),
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = false,
-            ValidateIssuerSigningKey = true            
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,            
+           ClockSkew = TimeSpan.Zero
         };
     });
 
