@@ -111,6 +111,26 @@
    ![WebAPIFloderStructure](images/ASPNetCoreWebAPI_FolderStructure.png)
 
  ***
+
+ ## End-to-End Request Lifecycle
+
+   The total ASP.NET Core Web API processing sequence is:
+  
+   1. Web Server:- Kestrel receives HTTP request
+
+   2.  Middleware:- ExceptionHandler, HTTPS Redirection
+
+   3.  Routing Middleware:- UseRouting() maps endpoint
+
+   4.  Authentication/Authorization:-	UseAuthentication(), UseAuthorization()
+
+   5.	MVC Filter Pipeline:- Authorization → Resource → Action → Exception → Result
+
+   6.	Controller Execution:- Invokes action method and services
+
+   7.  Response Return:- Data flows back through middleware in reverse order
+
+ ***
  ## Explain Program.cs file code - Configure Service and Middleware
 
    **Configuration and building** of **WebApplication** by **adding servicess** and **handling incoming Request** using **Middleware**
@@ -254,20 +274,71 @@
  ***
 
  ## Main Concepts Of Projects
+
+ 1. **Services** :-
+   - Services are reusable code block/logic registered in the Dependency Injection (DI) container which have their own indenpendent functionality. 
+      Functionality such as authentication,data access,logs management,etc
+   - By injecting into controllers, middleware, or other services, developers can do code reusability, maintainability, and separation of concerns within their applications.
+
+     - **Service Lifetimes** :- Services can be registered with different lifetimes, such as Singleton (one instance for the entire application), Scoped (one instance per request), or Transient (a new instance each time it is requested).
+
+     Syntax:-
+            ```csharp
+                  builder.Services.AddScoped<IProductService, ProductService>();
+            ```
+
+ 2. **Middleware** :- 
+    - Middleware is sequence pipeline of processes that each HTTP incoming request and outcoming response 
+    - Process such as authentication, logging, error handling, or modifying the request/response. 
   
-  1. **Controller** :- 
+       Syntax:-
+                
+              ```csharp
+    
+                    var app = builder.Build();     
+                    app.UseExceptionHandler("/error");       // 1. Error handling
+                    app.UseHsts();                           // 2. Enforce HTTPS
+                    app.UseHttpsRedirection();               // 3. Redirect HTTP → HTTPS
+                    app.UseResponseCompression();            // 4. Compress responses
+                    app.UseStaticFiles();                    // 5. Serve static content
+                    app.UseRouting();                        // 6. Match route patterns
+                    app.UseCors();                           // 7. Apply CORS rules
+                    app.UseAuthentication();                 // 8. Verify user credentials
+                    app.UseAuthorization();                  // 9. Enforce access permissions
+                    app.UseSession();                        // 10. Maintain user sessions
+                    app.UseOutputCache();                    // 11. Cache processed outputs
+                    app.UseRateLimiter();                    // 12. Apply rate limiting
+                    app.MapControllers();                    // 13. Endpoint execution (Controller/Action)
+                    app.Run();
+    
+             ```
+   3. **Filters** :- 
+      - Filters pre/post logic in the request processing pipeline, such as before an action method is called or after a response is generated.
+      - Independent Logic like logging, caching, validation, or error handling.
+      
+        **Types of Filters as Per Priority**:-
+         - **Authorization Filters** :- Proority of ExtionExecute before any other filter to determine if the user is authorized to access the resource.
+         - **Resource Filters** :- Execute after authorization but before model binding. Used for caching or modifying the request.
+         - **Action Filters** :- Execute before and after an action method. Used for logging, validation, etc.
+         - **Exception Filters** :- Handle unhandled exceptions thrown during action execution.
+         - **Result Filters** :- Execute before and after the action result is executed. Used for modifying the response.
+         
+        Syntax:-
+               ```csharp
+                    [Authorize]
+                    public class ProductsController : ControllerBase
+                    {
+                        // Action methods
+                    }
+               ```
+  
+  4. **Controller** :- 
       
      Each Controller, 
        - **ControllerBase class** :- Controller is derived class of ControllerBase class which internal handles the incoming HTTP requests and outgoing HTTP responses. It provides various methods and properties to work with HTTP requests and responses, such as accessing request headers, query parameters, and request body data. It also provides methods for returning different types of responses, such as JSON, XML, or plain text.   
        - **APIController Attribute** :- This attribute is used to indicate that a class is a Web API controller. It provides additional functionality and behavior specific to Web API controllers, such as attribute routing, automatic model validation and response formatting.
-
+         
   
-  2. **Dependency Injection (DI)** :- 
-     
-     - **Service Registration** :- In the Program.cs file, services are registered with the dependency injection container using the builder.Services collection. This allows you to configure and manage dependencies for your application.
-     - **Service Resolution** :- When a controller or other component requires a service, it can request it through constructor injection. The dependency injection container will automatically resolve and provide the required service instance.
-     - **Service Lifetimes** :- Services can be registered with different lifetimes, such as Singleton (one instance for the entire application), Scoped (one instance per request), or Transient (a new instance each time it is requested). This allows you to control the lifecycle of your services based on your application's needs.
-
 ***
 ***
 
@@ -376,7 +447,8 @@
       Useful for reducing multiple downstream calls into a single upstream response.
 
    3. **GlobalConfiguration**
-         Settings applied globally to all routes.
+   
+      Settings applied globally to all routes.
 
       Syntax:
 
@@ -482,8 +554,122 @@
             var tokenString = tokenHandler.WriteToken(token);
         ```
 
-   
-     
+   ***
+   ***
 
+   # Interview
+
+   ## Key Differences
+        
+   ### **Abstract Class vs Interface**
+  
+   **Aspect              	                Abstract Class	                                                                Interface**
+   Instantiation	                    Cannot be instantiated	                                                Cannot be instantiated
+   Method Implementation	Can have both abstract and concrete methods	        Only abstract methods (except default methods in latest C#)
+    Fields & Constructors       	Can have fields and constructors	                                No fields or constructors
+    Access Modifiers                	Can have varying access modifiers	                            Members are public by default
+    Inheritance	                        Supports single inheritance (extends)	                        Supports multiple inheritance (implements)
+    Use Case	                            When classes share common behavior	                    To specify a contract across unrelated types
+    Abstraction Level	            Partial abstraction	                                                        Full abstraction
+
+   ### ** Object vs var vs dynamic**
+
+   - ** Object**: 
+      1. The base type for all data types in C#. 
+      2. It requires explicit casting to convert to a specific type. 
+      3. It is statically typed, meaning the type is determined at compile time.
+
+   - ** var**: 
+      1. Implicitly typed local variable.
+      2. The type is inferred by the compiler based on the assigned value.
+      3. It is statically typed, meaning the type is determined at compile time.
+   
+   - ** dynamic**: 
+      1. A type that bypasses compile-time type checking.
+      2. The type is determined at runtime, allowing for more flexibility.
+      3. It can lead to runtime errors if the expected members or methods are not present.
+
+   ## SOLID Principles
+   - **Single Responsibility Principle (SRP)**: A class should have only one reason to change, meaning it should have only one job or responsibility.
+       
+        Eg: 
+          
+          ```csharp
+                public class Invoice
+                {
+                    public void CalculateTotal() { /* ... */ }
+                }
+                public class InvoiceRepository
+                {
+                    public void SaveToDatabase(Invoice invoice) { /* ... */ }
+                }
+          ```
+       Explaination: The Invoice class now only handles invoice calculations, while the InvoiceRepository class handles database operations.
+
+  - **Open/Closed Principle (OCP)**: Software entities (classes, modules, functions, etc.) should be open for extension but closed for modification.
+        
+       Eg:
+ 
+         ```csharp
+                abstract class PaymentMethod {
+                        public abstract void Pay();
+                 }
+                 
+                 class CreditCardPayment : PaymentMethod {
+                        public override void Pay() { /* credit card pay logic */ }
+                  }
+         ```
+       
+       Explaination: You can add new payment methods by extending PaymentMethod without modifying existing code.
+
+  - **Liskov Substitution Principle (LSP)**: Derived classes should be substitutable for their base classes without altering the correctness of the program.
+        
+       Eg:
+ 
+         ```csharp
+                class Bird {
+                        public virtual void Fly() { /* flying logic */ }
+                 }
+                 
+                 class Penguin : Bird {
+                        public override void Fly() {
+                            throw new NotSupportedException("Penguins can't fly");
+                        }
+                  }
+         ```
+       
+       Explaination: Penguin violates LSP because it cannot substitute Bird without changing expected behavior. 
+   
+  - **Interface Segregation Principle (ISP)**: Clients should not be forced to depend on interfaces they do not use. 
+       
+       Eg:
+ 
+         ```csharp
+                interface IPrinter {
+                        void Print();
+                 }
+                 
+                 interface IScanner {
+                        void Scan();
+                  }
+         ```
+       
+       Explaination: Instead of a single interface with both Print and Scan methods, we have separate interfaces for each functionality. 
+   
+   - **Dependency Inversion Principle (DIP)**: High-level modules should not depend on low-level modules. Both should depend on abstractions. Abstractions should not depend on details. Details should depend on abstractions.
+        
+       Eg:
+ 
+         ```csharp
+                interface IMessageSender {
+                        void SendMessage(string message);
+                 }
+                 
+                 class EmailSender : IMessageSender {
+                        public void SendMessage(string message) { /* email sending logic */ }
+                  }
+         ```
+       
+       Explaination: The high-level module (e.g., NotificationService) depends on the IMessageSender abstraction rather than a concrete implementation like EmailSender.
     
-     
+ 
