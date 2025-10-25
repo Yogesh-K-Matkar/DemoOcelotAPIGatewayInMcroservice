@@ -589,7 +589,8 @@
       2. The type is determined at runtime, allowing for more flexibility.
       3. It can lead to runtime errors if the expected members or methods are not present.
 
-   ## SOLID Principles
+   ## **SOLID Principles**
+
    - **Single Responsibility Principle (SRP)**: A class should have only one reason to change, meaning it should have only one job or responsibility.
        
         Eg: 
@@ -672,4 +673,30 @@
        
        Explaination: The high-level module (e.g., NotificationService) depends on the IMessageSender abstraction rather than a concrete implementation like EmailSender.
     
- 
+   ## **Design Principle**
+
+   3 Type:- CREATIONAL, STRUCTURAL, BEHAVIORAL
+
+   - **Creational Design Patterns**: Creation mechanisms, trying to create objects in a manner suitable to the situation. 
+      
+      Examples:-
+   
+        - Singleton :- 1 single instance entrie application
+          Purpose:- Mainly used for global configuration,loggin, caching,etc
+        
+        - Factory Method :- Abstract class with interface to create object but let subclass decide which class to instantiate.
+          Purpose:- Mainly used when the exact type of the object to be created is determined at runtime. 
+        
+        - 
+
+
+
+
+
+
+         
+
+
+
+
+           Factory Method, Abstract Factory, Builder, and Prototype patterns.
