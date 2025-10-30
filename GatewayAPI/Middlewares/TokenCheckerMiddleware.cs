@@ -9,13 +9,13 @@ namespace GatewayAPI.Middlewares
 
             string requestPath = context.Request.Path.Value!;
 
-            if (requestPath.Contains("AccountRegister", StringComparison.CurrentCultureIgnoreCase) ||
-                requestPath.Contains("AccountLogin", StringComparison.CurrentCultureIgnoreCase) ||
-                 requestPath.Contains("AccountUsers", StringComparison.CurrentCultureIgnoreCase) ||
-                requestPath.Contains("UsersListing", StringComparison.CurrentCultureIgnoreCase) ||
-                requestPath.Contains("WeatherListing", StringComparison.CurrentCultureIgnoreCase) ||
-                requestPath.Contains("AllListingAggregateRequest", StringComparison.CurrentCultureIgnoreCase) ||
-                requestPath.Equals("/"))
+            if (requestPath.Contains("AccountRegister", StringComparison.CurrentCultureIgnoreCase) 
+                || requestPath.Contains("AccountLogin", StringComparison.CurrentCultureIgnoreCase) 
+                || requestPath.Contains("AccountUsers", StringComparison.CurrentCultureIgnoreCase) 
+                || requestPath.Contains("UsersListing", StringComparison.CurrentCultureIgnoreCase) 
+                || requestPath.Contains("WeatherListing", StringComparison.CurrentCultureIgnoreCase) 
+                || requestPath.Contains("AllListingAggregateRequest", StringComparison.CurrentCultureIgnoreCase))
+                //|| requestPath.Equals("/"))
             {
                 await next(context);
             }
