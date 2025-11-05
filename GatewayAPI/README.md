@@ -672,31 +672,153 @@
          ```
        
        Explaination: The high-level module (e.g., NotificationService) depends on the IMessageSender abstraction rather than a concrete implementation like EmailSender.
-    
-   ## **Design Principle**
-
-   3 Type:- CREATIONAL, STRUCTURAL, BEHAVIORAL
-
-   - **Creational Design Patterns**: Creation mechanisms, trying to create objects in a manner suitable to the situation. 
-      
-      Examples:-
    
-        - Singleton :- 1 single instance entrie application
-          Purpose:- Mainly used for global configuration,loggin, caching,etc
+   *** 
+    
+   ## **HTTP Response**
+
+   - **Response**:
+   
+     200 - OK: The request has succeeded.
+     201 - Created: The request has been fulfilled and resulted in a new resource being created.
+     202 - Accepted: The request has been accepted for processing, but the processing has not been completed.
+     204 - No Content: The server successfully processed the request, but is not returning any content.
+      
+     400 - Bad Request: The server cannot or will not process the request due to a client error.
+     401 - Unauthorized: The request requires user authentication.
+     403 - Forbidden: The server understood the request, but refuses to authorize it.
+     404 - Not Found: The requested resource could not be found.
+     406 - Not Acceptable: The requested resource is capable of generating only content not acceptable according to the Accept headers sent in the request.
+    
+     500 - Internal Server Error: An unexpected condition was encountered on the server.
+     501 - Not Implemented: The server does not support the functionality required to fulfill the request.
+     502 - Bad Gateway: The server received an invalid response from the upstream server.
+     503 - Service Unavailable: The server is currently unable to handle the request due to temporary overload or maintenance.
+
+     ***
+   
+   # DevOps
+    
+   ## DOCKER
+   
+   -  Dockerfiles created by developers or users. Its human written text(what software and configurations it should include) file contains to build DockerImage.
+   
+   -  Docker Engine runtime environment that read Dockerfiles text(what software and configurations it should include) and builds a Docker image from it also runs containers from those images and also
+      shows list of containers and images on local machine.
+    
+        URL To Install Docker Engine Application: https://docs.docker.com/desktop/install/windows-install/ 
+     
+   -  DockerHub is cloud-based registry service that allows you to store and share DockerImages with others. It provides a centralized repository where required developers can publish, discover, and download DockerImages for various applications and services.
+    
+        Images can be public (accessible to anyone) or private (restricted access). 
+    
+        Online URL To Access Self Created Images or Global Shared DockerImages:  https://hub.docker.com/ 
+     
+        (**Note**:- But doesn't help in creating container from downloaded DockerImages, that's why Docker Engine is need in machine to create Container from DockerImage) 
+
+   -  Check Docker is install or not 
         
-        - Factory Method :- Abstract class with interface to create object but let subclass decide which class to instantiate.
-          Purpose:- Mainly used when the exact type of the object to be created is determined at runtime. 
+      Syntax:
+    
+            ```bash
+                    docker --version    or   docker -v
+            ```                  
+   
+   -  To avoid inconsistency of application and dependencies across different environments (Development, Testing, Staging, Production,etc) by sharing images known as docker images(exe file to extract to form container on another machine). 
+     
+   -  Docker uses Linux kernel to form lightweight,linux commands in **Linux container on Windows machines** using WSL2(Windows Subsystem for Linux), so Docker is lightweight and fast. 
+          
         
-        - 
+        Syntax:
+    
+              ```bash
+                    wsl --install                   //Install WSL required components for linux environment 
+                     
+                    wsl -version   or   wsl  -v     //Check WSL version    
 
+              ```
 
+   - Docker uses Hyper-V to form **Windows container on Windows machines**.
 
+     
+   Examples of Common Docker Commands require Docker Engine installed and running:    
 
+   1. Create Container from sample ubuntu dockerimage locally in machine/globally from dockerhub global/public images, then download and run interactively.
+        Syntax:
+         
+    
+        - **Pull DockerImage from DockerHub in Local Machine**:
+    
+              ```bash
+                    docker pull <image_name>     or  docker pull <image_id_>
+              ``` 
 
+    
+        - **Run Container using DockerImage**:
+    
+              ```bash
+                    docker run -it <image_name>     or  docker run -it <image_id_>          // -it stands for interactive terminal
+              ```
 
+        - **Keep Container running till Terminal is not exit/closed**:
+    
+              ```bash
+                    docker run -it --rm ubuntu          // --rm stands for remove container after exit
+              ```
+        - **Run Container with custom name**:
+    
+              ```bash
+                    docker run -it --name myubuntu ubuntu          // --name assign custom name to container
+              ```
+                
+
+   2. List all containers
+        Syntax:
+         Only Running Containers:
+    
+              ```bash
+                    docker ps                                     // ps- for container, images- for dockerimages  
+              ```         All Containers (Running and Stopped):                  ```bash                    docker ps -a     docker images -a             // ps- for container, images- for dockerimages and  -a stands for all container/images based on cmd              ```    
+   
+
+   3. Delete a specific 
+   
+        Syntax:
+        
+        - Container :
+    
+              ```bash
+                    docker rm <container_id>          // rm- Remove container, container_id can be find by docker ps -a command
+              ```
+             
+             Forcefull delete
+       
+              ```bash
+                    docker rm -f <container_id>       // rm-remove, -f - forceful delete, container_id can be find by docker ps -a command
+              ```   
+                
+        - DockerImage : DockerImage cannot be deleted until and unless its all containers are deleted which are created from that DockerImage.
+    
+              ```bash
+                    docker rmi <image_id>             // rmi - Remove image, image_id can be find by docker images command
+              ```
+              
+             Forcefull delete
+       
+              ```bash
+                    docker rmi -f <image_id>          // rmi- remove image, -f - forceful delete, image_id can be find by docker images command
+              ```
+        
+   4. See OS type of DockerImage e.g Linux amd64/linux  or Windows  adm64/windows  
+   
+        Syntax:
+    
+              ```bash
+                    docker image inspect <image_id>          // image_id can be find by docker images command
+              ```
          
 
 
 
 
-           Factory Method, Abstract Factory, Builder, and Prototype patterns.
+   
